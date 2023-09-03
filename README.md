@@ -1,100 +1,139 @@
-# Desafio Técnico - Backend
+# Kanban API - Arquitetura e Princípios
 
-O propósito desse desafio é a criação de uma API que fará a persistência de dados de um quadro de kanban. Esse quadro possui listas, que contém cards.
+## Introdução
 
-## Rodando o Frontend
+A Kanban API é uma aplicação que oferece um sistema de persistência de dados para um quadro de Kanban, seguindo as práticas do Domain-Driven Design (DDD). Esta documentação explora as decisões arquiteturais e os princípios utilizados na estruturação da aplicação, bem como as vantagens da utilização do Prisma.
 
-Um frontend de exemplo foi disponibilizado na pasta FRONT.
+## Princípios de Design
 
-Para rodá-lo, faça:
+### Separação de Responsabilidades
 
-```console
-> cd FRONT
-> yarn
-> yarn start
-```
+Um dos principais princípios utilizados na Kanban API é a separação de responsabilidades. A arquitetura da aplicação é dividida em diferentes camadas, cada uma com um propósito específico:
 
-## Desafio
+1. **Camada de Transporte:** Responsável por lidar com as requisições HTTP, validações de entrada e retornar respostas apropriadas. Essa camada contém os handlers das rotas.
 
-Você precisa criar uma API REST de acordo com os requisitos abaixo, que deve ser desenvolvido na pasta "BACK".
+2. **Camada de Domínio:** Contém a lógica de negócios e as regras do domínio da aplicação. Aqui, definimos as entidades, agregados, objetos de valor e repositórios.
 
-Para criar sua API você pode escolher entre duas tecnologias:
+3. **Camada de Dados:** Responsável pelo acesso ao banco de dados e gerenciamento das operações CRUD. Aqui, o Prisma ORM é utilizado para interagir com o PostgreSQL.
 
-1. Javascript ou Typescript + NodeJS + Express
-2. C# + ASP.NET Core + WebApi
+### Benefícios da Separação
 
-## Requisitos
+A separação de responsabilidades traz diversos benefícios:
 
-1. O sistema deve ter um mecanismo de login usando JWT, com um entrypoint que recebe `{ "login":"letscode", "senha":"lets@123"}` e gera um token.
+- **Legibilidade:** Cada camada possui um foco específico, tornando o código mais legível e compreensível.
 
-2. O sistema deve ter um middleware que valide se o token é correto, valido e não está expirado, antes de permitir acesso a qualquer outro entrypoint. Em caso negativo retorne status 401.
+- **Manutenção:** Mudanças em uma camada não afetam as outras, permitindo a evolução e manutenção da aplicação de forma mais isolada.
 
-3. O login e senha fornecidos devem estar em variáveis de ambiente e terem uma versão para o ambiente de desenvolvimento vinda de um arquivo .env no node ou de um arquivo de configuração no ASP.NET. Esse arquivo não deve subir ao GIT, mas sim um arquivo de exemplo sem os valores reais. O mesmo vale para qualquer "segredo" do sistema, como a chave do JWT.
+- **Testabilidade:** A separação facilita a criação de testes unitários e de integração, uma vez que a lógica está bem encapsulada.
 
-4. Um card terá o seguinte formato:
+## Estrutura do Projeto
 
-```
-id: int | (guid [c#] | uuid [node])
-titulo : string,
-conteudo: string,
-lista: string
-```
+A estrutura do projeto segue os princípios mencionados:
 
-5. Os entrypoints da aplicação devem usar a porta 5000 e ser:
+- **src:** Contém os handlers das rotas e lógica de transporte.
 
-```
-(POST)      http://0.0.0.0:5000/login/
+- **src/cards:** Contém a implementação relacionada aos cards, incluindo esquema, repositório, serviço e rotas.
 
-(GET)       http://0.0.0.0:5000/cards/
-(POST)      http://0.0.0.0:5000/cards/
-(PUT)       http://0.0.0.0:5000/cards/{id}
-(DELETE)    http://0.0.0.0:5000/cards/{id}
-```
+- **src/shared:** Contém componentes compartilhados, como middlewares, configurações e tipos.
 
-6. Para inserir um card o título, o conteúdo e o nome da lista devem estar preenchidos, o id não deve conter valor. Ao inserir retorne o card completo incluindo o id atribuído com o statusCode apropriado. Caso inválido, retorne status 400.
+- **src/shared/middlewares:** Contém middlewares utilizados na validação e autenticação das requisições.
 
-7. Para alterar um card, o entrypoint deve receber um id pela URL e um card pelo corpo da requisição. Valem as mesmas regras de validação do item acima exceto que o id do card deve ser o mesmo id passado pela URL. Na alteração todos os campos são alterados. Caso inválido, retorne status 400. Caso o id não exista retorne 404. Se tudo correu bem, retorne o card alterado.
+- **src/shared/database:** Contém a configuração do banco de dados e o uso do Prisma ORM.
 
-8. Para remover um card, o entrypoint deve receber um id pela URL. Caso o id não exista retorne 404. Se a remoção for bem sucedida retorne a lista de cards.
+- **src/shared/routes:** Define as rotas utilizadas pela aplicação.
 
-9. A listagem de cards deve enviar todos os cards em formato json, contendo as informações completas.
+- **src/shared/schemas:** Define os schemas de banco de dados utilizando o Prisma.
 
-10. Deve ser usada alguma forma de persistência, no C# pode-se usar o Entity Framework (in-memory), no nodeJS pode ser usado Sequelize + sqlite (in-memory) ou diretamente o driver do sqlite (in-memory).
+- **src/shared/types:** Contém tipos e interfaces utilizados em diferentes partes da aplicação.
 
-11. Se preferir optar por utilizar um banco de dados "real", adicione um docker-compose em seu repositório que coloque a aplicação e o banco em execução, quando executado `docker-compose up` na raiz. A connection string e a senha do banco devem ser setados por ENV nesse arquivo.
+## Vantagens do Prisma
 
-12. O campo conteúdo do card aceitará markdown, isso não deve impactar no backend, mas não custa avisar...
+O Prisma é uma escolha poderosa para a camada de dados da aplicação por vários motivos:
 
-13. Faça um filter (asp.net) ou middleware (nodejs) que escreva no console sempre que os entrypoints de alteração ou remoção forem usados, indicando o horário formatado como o datetime a seguir: `01/01/2021 13:45:00`.
+- **Abstração do Banco de Dados:** O Prisma oferece uma abstração para as operações de banco de dados, permitindo escrever consultas de forma mais intuitiva.
 
-A linha de log deve ter o seguinte formato (se a requisição for válida):
+- **Segurança:** As consultas geradas pelo Prisma são protegidas contra SQL Injection, aumentando a segurança da aplicação.
 
-`<datetime> - Card <id> - <titulo> - <Remover|Alterar>`
+- **Migrações Automáticas:** O Prisma facilita a migração do esquema do banco de dados à medida que a aplicação evolui, sem a necessidade de escrever scripts complexos.
 
-Exemplo:
+- **Tipagem Forte:** O Prisma gera tipos TypeScript com base nas definições do esquema do banco de dados, garantindo a integridade dos dados.
 
-```console
-> 01/01/2021 13:45:00 - Card 1 - Comprar Pão - Removido
-```
+- **Desacoplamento:** O Prisma separa o acesso ao banco de dados do restante da aplicação, facilitando mudanças futuras.
 
-14. O projeto deve ser colocado em um repositório GITHUB ou equivalente, estar público, e conter um readme.md que explique em detalhes qualquer comando ou configuração necessária para fazer o projeto rodar. Por exemplo, como configurar as variáveis de ambiente, como rodar migrations (se foram usadas).
+## Configuração de Porta
 
-15. A entrega será apenas a URL para clonarmos o repositório.
+A porta padrão da aplicação foi alterada para 3333 para evitar conflitos com a porta 5000, que é a padrão no macOS. Certifiquei-me de que essa alteração também fosse refletida no código do frontend.
 
-## Diferenciais e critérios de avaliação
+## Testes Não Implementados
 
-Arquiteturas que separem responsabilidades, de baixo acoplamento e alta-coesão são preferíveis, sobretudo usando dependências injetadas, que permitam maior facilidade para testes unitários e de integração.
+Devido a limitações de tempo, não foram implementados testes para a aplicação. Recomenda-se adicionar testes no futuro para garantir a qualidade e a robustez do código.
+Certainly! Here's the setup guide translated into Portuguese:
 
-Avaliaremos se o código é limpo (com boa nomenclatura de classes, variáveis, métodos e funções) e dividido em arquivos bem nomeados, de forma coesa e de acordo com boas práticas. Bem como práticas básicas como tratamento de erros.
+---
 
-Desacoplar e testar as regras de negócios / validações / repositório com testes unitários será considerado um diferencial.
+## Guia de Configuração do Projeto
 
-O uso de typescript no node acompanhado das devidas configurações e tipagens bem feitas, bem como uso de técnicas de abstração usando interfaces (especialmente do repositório) serão consideradas um deferencial.
+### Setup Local
 
-O uso de Linter será considerado um diferencial.
+Este guia ajudará você a configurar o projeto kanban no seu computador local usando o Docker. No final desta configuração, você terá a API acessível em `localhost:3333` e o frontend em `localhost:3000`.
 
-A criação de um docker-compose e de dockerfiles que ao rodar `docker-compose up` subam o sistema por completo (front, back e banco [se houver]) será considerado um diferencial.
+### Pré-requisitos
 
-Teve dificuldade com algo, ou fez algo meio esquisito para simplificar algo que não estava conseguindo fazer? Deixe uma observação com a justificativa no readme.md para nós...
+- Docker instalado em sua máquina.
+- Docker Compose instalado em sua máquina.
 
-Entregou incompleto, teve dificuldade com algo, ou fez algo meio esquisito para simplificar alguma coisa que não estava conseguindo fazer? Deixe uma observação com a justificativa no readme.md para nós...
+### Passos
+
+1. **Clonar o Repositório**
+
+   ```bash
+   git clone [https://github.com/LeoTexx/kanban-board] projeto_kanban
+   cd projeto_kanban
+   ```
+
+2. **Configurar Variáveis de Ambiente**
+
+   Antes de iniciar os serviços, certifique-se de configurar as variáveis de ambiente necessárias para que o aplicativo funcione corretamente.
+
+   Atualize o arquivo `docker-compose.yml` com os valores apropriados:
+
+   ```yaml
+   ...
+   api:
+     ...
+     args:
+       - DATABASE_URL=postgres://[SEU_USUARIO_DB]:[SUA_SENHA_DB]@postgres:5432/[NOME_DO_SEU_DB]
+       - AUTH_USERNAME=[SEU_NOME_USUARIO_API]
+       - AUTH_PASSWORD=[SUA_SENHA_API]
+       - JWT_SECRET=[SUA_CHAVE_SECRETA_JWT]
+   ...
+   ```
+
+3. **Construir e Iniciar os Serviços**
+
+   Execute o seguinte comando:
+
+   ```bash
+   docker-compose up --build
+   ```
+
+   Isso construirá as imagens Docker para a API e o frontend e, em seguida, iniciará os containers.
+
+4. **Acessar os Serviços**
+
+   - A API estará acessível em: [http://localhost:3333](http://localhost:3333)
+   - O Frontend estará acessível em : [http://localhost:3000](http://localhost:3000)
+
+5. **Desligar e Limpar**
+
+   Para parar os serviços, pressione `Ctrl+C` no terminal onde o `docker-compose` está sendo executado.
+
+   Para remover completamente as imagens, containers, redes e volumes construídos, você pode executar:
+
+   ```bash
+   docker-compose down --volumes
+   ```
+
+## Conclusão
+
+A Kanban API adota princípios de separação de responsabilidades e utiliza o Prisma como uma ferramenta poderosa para acesso ao banco de dados. A estrutura do projeto e a arquitetura escolhida permitem uma aplicação mais modular, testável e escalável, preparada para enfrentar os desafios futuros do desenvolvimento.
