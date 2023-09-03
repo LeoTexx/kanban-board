@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import dotenv from "dotenv";
 import { PrismaDatabase } from "./shared/database/PrismaDatabase";
 import { CardRepository, CardHandler, CardService, CardRouter } from "./cards";
@@ -6,9 +7,10 @@ import { AuthRouter } from "./shared/routes/AuthRouter";
 import { GlobalRoutes } from "./routes";
 
 dotenv.config();
+const PORT = 3333;
 
 const app = express();
-const PORT = 5000;
+app.use(cors());
 
 const prismaDatabase = PrismaDatabase.getInstance();
 const cardRepository = new CardRepository(prismaDatabase);

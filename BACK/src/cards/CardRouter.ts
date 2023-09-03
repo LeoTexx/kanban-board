@@ -1,23 +1,23 @@
-import { Router } from 'express'
-import { LoggerMiddleware } from '../shared/middlewares/logger'
-import { type CardHandler } from '../cards/CardHandler'
+import { Router } from "express";
+import { LoggerMiddleware } from "../shared/middlewares/logger";
+import { type CardHandler } from "../cards/CardHandler";
 
 export class CardRouter {
-  private readonly router: Router
+  private readonly router: Router;
 
-  constructor (private readonly cardHandler: CardHandler) {
-    this.router = Router()
-    this.initializeRoutes()
+  constructor(private readonly cardHandler: CardHandler) {
+    this.router = Router();
+    this.initializeRoutes();
   }
 
-  private initializeRoutes () {
+  private initializeRoutes() {
     this.router
-      .route('/cards/')
+      .route("/")
       .get(this.cardHandler.getCards.bind(this.cardHandler))
-      .post(this.cardHandler.createCard.bind(this.cardHandler))
+      .post(this.cardHandler.createCard.bind(this.cardHandler));
 
     this.router
-      .route('/cards/:id')
+      .route("/:id")
       .put(
         LoggerMiddleware.logChanges,
         this.cardHandler.updateCard.bind(this.cardHandler)
@@ -25,10 +25,10 @@ export class CardRouter {
       .delete(
         LoggerMiddleware.logChanges,
         this.cardHandler.deleteCard.bind(this.cardHandler)
-      )
+      );
   }
 
-  public getRouter (): Router {
-    return this.router
+  public getRouter(): Router {
+    return this.router;
   }
 }
