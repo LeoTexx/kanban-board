@@ -1,0 +1,31 @@
+version: "1"
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_database
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: api
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: ./BACK
+      dockerfile: Dockerfile
+    container_name: kanban_api
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgres://admin:admin@postgres:5432/api
+      AUTH_USERNAME: letscode
+      AUTH_PASSWORD: lets@123
+      JWT_SECRET: your-secret-key
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
