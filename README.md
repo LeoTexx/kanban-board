@@ -87,7 +87,7 @@ Este guia ajudará você a configurar o projeto kanban no seu computador local u
 1. **Clonar o Repositório**
 
    ```bash
-   git clone [https://github.com/LeoTexx/kanban-board] projeto_kanban
+   git clone https://github.com/LeoTexx/kanban-board projeto_kanban
    cd projeto_kanban
    ```
 
@@ -124,7 +124,7 @@ Este guia ajudará você a configurar o projeto kanban no seu computador local u
    - A API estará acessível em: [http://localhost:3333](http://localhost:3333)
    - O Frontend estará acessível em : [http://localhost:3000](http://localhost:3000)
 
-5. **Desligar e Limpar**
+5. **Desligar e Remover**
 
    Para parar os serviços, pressione `Ctrl+C` no terminal onde o `docker-compose` está sendo executado.
 
