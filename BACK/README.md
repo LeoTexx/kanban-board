@@ -60,6 +60,80 @@ O Prisma é uma escolha poderosa para a camada de dados da aplicação por vári
 
 - **Desacoplamento:** O Prisma separa o acesso ao banco de dados do restante da aplicação, facilitando mudanças futuras.
 
+## Configuração de Porta
+
+A porta padrão da aplicação foi alterada para 3333 para evitar conflitos com a porta 5000, que é a padrão no macOS. Certifiquei-me de que essa alteração também fosse refletida no código do frontend.
+
+## Testes Não Implementados
+
+Devido a limitações de tempo, não foram implementados testes para a aplicação. Recomenda-se adicionar testes no futuro para garantir a qualidade e a robustez do código.
+Certainly! Here's the setup guide translated into Portuguese:
+
+---
+
+## Guia de Configuração do Projeto
+
+### Setup Local
+
+Este guia ajudará você a configurar o projeto kanban no seu computador local usando o Docker. No final desta configuração, você terá a API acessível em `localhost:3333` e o frontend em `localhost:3000`.
+
+### Pré-requisitos
+
+- Docker instalado em sua máquina.
+- Docker Compose instalado em sua máquina.
+
+### Passos
+
+1. **Clonar o Repositório**
+
+   ```bash
+   git clone [https://github.com/LeoTexx/kanban-board] projeto_kanban
+   cd projeto_kanban
+   ```
+
+2. **Configurar Variáveis de Ambiente**
+
+   Antes de iniciar os serviços, certifique-se de configurar as variáveis de ambiente necessárias para que o aplicativo funcione corretamente.
+
+   Atualize o arquivo `docker-compose.yml` com os valores apropriados:
+
+   ```yaml
+   ...
+   api:
+     ...
+     args:
+       - DATABASE_URL=postgres://[SEU_USUARIO_DB]:[SUA_SENHA_DB]@postgres:5432/[NOME_DO_SEU_DB]
+       - AUTH_USERNAME=[SEU_NOME_USUARIO_API]
+       - AUTH_PASSWORD=[SUA_SENHA_API]
+       - JWT_SECRET=[SUA_CHAVE_SECRETA_JWT]
+   ...
+   ```
+
+3. **Construir e Iniciar os Serviços**
+
+   Execute o seguinte comando:
+
+   ```bash
+   docker-compose up --build
+   ```
+
+   Isso construirá as imagens Docker para a API e o frontend e, em seguida, iniciará os containers.
+
+4. **Acessar os Serviços**
+
+   - A API estará acessível em: [http://localhost:3333](http://localhost:3333)
+   - O Frontend estará acessível em : [http://localhost:3000](http://localhost:3000)
+
+5. **Desligar e Limpar**
+
+   Para parar os serviços, pressione `Ctrl+C` no terminal onde o `docker-compose` está sendo executado.
+
+   Para remover completamente as imagens, containers, redes e volumes construídos, você pode executar:
+
+   ```bash
+   docker-compose down --volumes
+   ```
+
 ## Conclusão
 
 A Kanban API adota princípios de separação de responsabilidades e utiliza o Prisma como uma ferramenta poderosa para acesso ao banco de dados. A estrutura do projeto e a arquitetura escolhida permitem uma aplicação mais modular, testável e escalável, preparada para enfrentar os desafios futuros do desenvolvimento.

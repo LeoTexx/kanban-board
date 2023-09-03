@@ -1,5 +1,5 @@
-const AUTH_URL = 'http://localhost:3333/login';
-const CARD_URL = 'http://localhost:3333/cards';
+const AUTH_URL = "http://localhost:3333/login";
+const CARD_URL = "http://localhost:3333/cards";
 
 const CREDENTIAL = { login: 'letscode', senha: 'lets@123' };
 

@@ -16,16 +16,32 @@ services:
     build:
       context: ./BACK
       dockerfile: Dockerfile
+      args:
+        - DATABASE_URL=postgres://[YOUR_DB_USER]:[YOUR_DB_PASS]@postgres:5432/[YOUR_DB_NAME]
+        - AUTH_USERNAME=[YOUR_API_AUTH_USERNAME]
+        - AUTH_PASSWORD=[YOUR_API_AUTH_PASSWORD]
+        - JWT_SECRET=[YOUR_API_JWT_SECRET]
     container_name: kanban_api
     ports:
-      - "5000:5000"
-    environment:
-      DATABASE_URL: postgres://admin:admin@postgres:5432/api
-      AUTH_USERNAME: letscode
-      AUTH_PASSWORD: lets@123
-      JWT_SECRET: your-secret-key
+      - "3333:3333"
     depends_on:
       - postgres
+
+  frontend:
+    build:
+      context: ./FRONT
+      dockerfile: Dockerfile
+    container_name: kanban_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+    networks:
+      - kanban-network
+
+networks:
+  kanban-network:
+    driver: bridge
 
 volumes:
   postgres_data:
